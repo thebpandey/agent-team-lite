@@ -1,0 +1,13 @@
+# Integration by the orchestrator
+
+Keep main for planning, shared records, and receiving the integrated result. Do all feature edits and conflict repairs in the existing feature worktree. Do not create an integration worktree.
+
+1. Stop developer writes. Confirm the reviewer approved the actual source revision and there are no unresolved findings. Respect the project's permission to commit. Uncommitted changes are not a merge-ready revision.
+2. Check the main checkout's branch, HEAD, dirty files, and pending Git operations. Main means the project's actual primary branch, which may have another name. Do not switch a user's unrelated checkout or stash their changes silently. Shared planning notes can remain uncommitted only when they will not be overwritten by the authorized integration method; otherwise preserve them and resolve the concrete blocker.
+3. If main advanced, merge or rebase its current committed base into the feature branch under project rules, in the same feature worktree. Resolve conflicts there. Re-review affected source. Record the exact feature commit and observed main commit.
+4. For local integration, prefer a permitted fast-forward from the clean, correctly checked-out primary branch to the reviewed feature commit. Recheck main immediately before changing it; if it changed, return to step 3. Never force-update main. For protected branches, use the established pull-request process and wait for required approval/CI; no direct-push bypass. Keep the slot reserved while waiting. The orchestrator remains the integration owner even when GitHub performs the actual merge.
+5. Record proof that the reviewed change reached the primary branch. For a fast-forward or merge, verify ancestry. For a squash/rebase merge, record the merged PR and mapped primary revision plus source comparison evidence. Do not pass an unrelated primary commit to the slot helper as a substitute for this evidence.
+6. Stop team agents and owned processes. Confirm the feature worktree contains no unpreserved tracked, untracked, or ignored files. Use normal safe `git worktree remove`, never forced removal. Retain the branch unless its deletion is separately authorized. A failed cleanup keeps the team slot reserved.
+7. Write completion, integration evidence, checks/limitations, and removal result into the canonical task/resume notes. Set the slot to cleanup, then use the helper's finish action with the recorded integrated commit. A successful helper check confirms ancestry and worktree absence only; the orchestrator is responsible for review and integration evidence.
+
+Do not start a new task merely because a feature is reviewed, committed, or waiting for a merge. Only a successfully finished slot permits another start.

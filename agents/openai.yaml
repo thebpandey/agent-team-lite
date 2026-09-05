@@ -1,0 +1,13 @@
+interface:
+  display_name: Agent Team Lite
+  short_description: One team, one worktree, focused code review
+  default_prompt: Use $agent-team-lite start to implement one task with a single team.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
