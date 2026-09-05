@@ -1,0 +1,131 @@
+AGENT TEAM LITE PROPRIETARY FREE-USE LICENSE
+Version 1.0
+
+Copyright (c) 2026 Bhaskar Pandey and Almora Technology, LLC.
+All rights reserved.
+
+1. SCOPE
+
+This license governs Agent Team Lite, including its instructions, prompts,
+scripts, agent configuration, reference documents, templates, and assets
+(the "Skill"). The copyright holders above are the "Licensor."
+
+The Skill is proprietary software made available without a license fee.
+Public source access does not make it open source. By installing or using
+the Skill after being presented with these terms, you agree to them. If you
+do not agree, do not install or use it beyond rights independently available
+to you under applicable law or the hosting platform's terms.
+
+2. PERMITTED USE
+
+The Licensor grants you a nonexclusive, worldwide, royalty-free,
+nontransferable, nonsublicensable license to obtain the Skill from its
+authorized repository or LearnStack OS and:
+
+(a) install and run the unmodified Skill for personal, educational, internal
+business, or client-development work;
+(b) make private copies reasonably necessary for installation, execution,
+and backup, preserving the license and ownership notices; and
+(c) permit coding tools and automated agents to read and process the Skill
+solely to perform your authorized work. This includes necessary processing
+by your selected tool provider to deliver that service to you, but does not
+grant a separate right to publish or redistribute the Skill.
+
+No LearnStack OS subscription or paid entitlement is required for this Lite
+license. Ordinary task inputs, host settings, and project configuration are
+permitted. Runtime task records and project files created during normal use
+may be changed. These permissions do not authorize modification of the Skill
+itself or offering it as a hosted product to other users.
+
+3. RESTRICTIONS
+
+Except as expressly permitted here, independently permitted by applicable
+law or Section 4, or separately approved in writing by the Licensor, you
+must not:
+
+(a) modify, adapt, translate, or create derivative versions of the Skill;
+(b) distribute, share, republish, repackage, sell, rent, lend, sublicense,
+or transfer the Skill or substantial portions of its protected content;
+(c) embed the Skill in another distributable skill, plugin, AI assistant,
+training collection, software package, or hosted service for third parties;
+(d) remove or obscure copyright, ownership, or license notices; or
+(e) use AI tools or other automated processes to perform an act prohibited
+by this license, including producing modified copies for redistribution.
+
+You may share a link to the authorized repository or LearnStack OS page.
+Do not include the Skill in client deliverables, public project commits,
+or shared logs or transcripts except as independently permitted by
+Section 4. Retain private installations and backups securely.
+
+4. GITHUB AND OTHER INDEPENDENT RIGHTS
+
+Where the Skill is hosted publicly on GitHub, this license does not limit
+rights independently granted by the applicable GitHub Terms of Service,
+including viewing and forking through GitHub's functionality. A fork is not
+a grant of additional rights to modify, redistribute elsewhere, or sell
+the Skill under this license. Any rights that GitHub's terms independently
+grant remain unaffected.
+
+This agreement does not restrict exceptions or limitations provided by
+applicable law. It does not claim exclusive rights over unprotected ideas,
+systems, methods of operation, or independently created functionality.
+
+5. YOUR PROJECTS AND OUTPUTS
+
+The Licensor claims no ownership under this agreement in your inputs,
+applications, source code, documents, or other work created using the Skill.
+You may use, modify, distribute, and sell your resulting work, including
+client work, provided it does not redistribute the Skill or substantial
+portions of its protected content except as independently permitted.
+
+Your rights in resulting work survive termination of this license. Rights
+in third-party material and AI-generated outputs depend on applicable law
+and the relevant third-party terms. This license does not guarantee that
+any generated output is original, copyrightable, or noninfringing.
+
+6. OWNERSHIP AND THIRD-PARTY MATERIAL
+
+The Licensor retains its rights in the Skill. No trademark or endorsement
+rights are granted beyond displaying notices in authorized copies.
+Separately licensed third-party material remains subject to its own terms
+and required notices. This agreement does not revoke rights previously
+granted under another license; it applies to this release to the extent
+the Licensor has authority to license its content.
+
+7. TERMINATION
+
+The Licensor may terminate your rights under this license by written notice
+if you materially breach it. For a breach reasonably capable of correction,
+you have 14 days after notice to correct it. Unauthorized sale or deliberate
+redistribution permits immediate termination by notice.
+
+After termination, stop use authorized only by this license and remove usable
+copies under your control. Copies retained solely in inaccessible routine
+backups or legally required records must not be restored for use. Rights
+independently available under Section 4 remain unaffected. Ownership,
+restrictions, output rights, and applicable disclaimers survive termination.
+
+8. WARRANTIES AND LIABILITY
+
+To the extent permitted by law, the Skill is provided without warranties
+of accuracy, merchantability, fitness for a particular purpose, compatibility,
+or noninfringement. You are responsible for reviewing generated work,
+maintaining backups, protecting credentials, and authorizing project changes.
+No support, updates, or uninterrupted availability are promised.
+
+To the extent permitted by law, the Licensor is not liable for indirect,
+incidental, special, consequential, or punitive losses, including lost data,
+lost profits, or business interruption arising from the Skill. Nothing here
+excludes rights or liabilities that cannot lawfully be excluded.
+
+9. GENERAL AND CONTACT
+
+A separately executed written agreement with the Licensor controls where it
+expressly overrides these terms. Later license revisions do not automatically
+change the terms of a release already licensed to you. If a provision is
+unenforceable, the remaining provisions continue to the extent permitted by
+law. Failure to enforce a provision once does not waive later enforcement.
+
+Permissions and licensing inquiries: support@learnstackos.com
+https://www.learnstackos.com
+Authorized repository: https://github.com/thebpandey/agent-team-lite
