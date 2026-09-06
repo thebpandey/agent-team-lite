@@ -22,6 +22,7 @@ Give each teammate the task, owned paths, absolute worktree, relevant project ru
 - Developer: write only assigned feature files. Reviewer: read stable source and return concrete findings; do not edit source.
 - Do not write code documentation, create/run feature tests, use browser automation, or invoke external skills/plugins.
 - Report required project checks that conflict with the Lite scope. Do not bypass them.
+- Frame user-facing and relayed messages using [Lite output](output.md), with the Lite Developer/Reviewer role and no nested frames. Native tool payloads remain unchanged.
 - Send concise evidence and next action to the orchestrator, who alone updates task/resume records.
 - On pause, stop safely and report remaining activity; do not claim you stopped until writes are finished.
 

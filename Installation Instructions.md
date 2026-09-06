@@ -112,10 +112,16 @@ Paths below are relative to the installed `agent-team-lite` folder:
 
 The host invokes the helper through `sh`, so execution does not depend on a ZIP extractor retaining its executable permission. Keep the script's Unix line endings; do not convert it to Windows CRLF.
 
+Install all reference files, including `commands.md`, `output.md`, and `runs.md`, and keep `CHANGELOG.md`. No full agent-team package or additional runtime dependency is needed. The package version is **6.1.0**, authoritative in SKILL.md metadata. Refresh the host after replacing a complete installation. `help` displays the installed version without checking for remote updates; it works without reserving a slot or starting work.
+
 ## 6. Use the limited command set
 
 | Action | Codex | Claude Code |
 | --- | --- | --- |
+| Read help/version | `$agent-team-lite help` | `/agent-team-lite help` |
+| Read defaults | `$agent-team-lite settings` | `/agent-team-lite settings` |
+| Save defaults | `$agent-team-lite settings continuous=on auto-deploy=off` | `/agent-team-lite settings continuous=on auto-deploy=off` |
+| Serial queue | `$agent-team-lite start continuous` | `/agent-team-lite start continuous` |
 | Start one task | `$agent-team-lite start [task]` | `/agent-team-lite start [task]` |
 | Read progress | `$agent-team-lite status` | `/agent-team-lite status` |
 | Pause the only team | `$agent-team-lite pause` | `/agent-team-lite pause` |
@@ -123,7 +129,9 @@ The host invokes the helper through `sh`, so execution does not depend on a ZIP 
 
 An active, paused, or interrupted team blocks another start in the same repository. A pause preserves its worktree. Resume continues that team. Do not delete reservation files to force a new task.
 
-Lite does not provide `with-preview`, `approve`, named-team targeting, or `all` actions. It does not add feature testing, documentation agents, or deployment automation. The README explains the full scope.
+Lite does not provide `with-preview`, `approve`, named-team targeting, or `all` actions. It does not add feature testing or documentation agents. Limited per-task auto-deploy and serial continuous mode are optional and default to off. The README explains the full scope.
+
+Plain language `agent-team-lite start continuous` works too. Use `start continuous auto-deploy` for explicit run-only deployment through the established project mechanism/target. `start no-continuous no-auto-deploy` overrides saved preferences. Only leading exact modifiers are parsed; use `start -- task text` for literal scope. Both settings default to off in the primary checkout's `.agent-team-lite/settings.json`; explicit run choices override saved defaults, then built-in defaults. Saved deployment on requires a keep/disable choice before start. Reading/saving settings never starts or deploys. See [command rules](references/commands.md).
 
 ## Troubleshooting
 

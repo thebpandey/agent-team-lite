@@ -1,7 +1,7 @@
 interface:
   display_name: Agent Team Lite
-  short_description: One team, one worktree, focused code review
-  default_prompt: Use $agent-team-lite start to implement one task with a single team.
+  short_description: One team, serial tasks, focused source review
+  default_prompt: Use $agent-team-lite help for commands, or start to implement one scoped task; continuous mode is serial and optional.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:

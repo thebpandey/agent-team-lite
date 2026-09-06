@@ -2,7 +2,7 @@
 
 The slot helper requires only a standard shell, Git, and ordinary system utilities. Run it from the project or any linked worktree with `sh /absolute/installed/skill/scripts/team-slot.sh ...`. These are internal helpers, not extra user-facing skill commands.
 
-The helper stores its reservation under the canonical Git common directory at `agent-team-lite/slot`. `mkdir` reserves an operation lock atomically so concurrent starts cannot both succeed. The slot remains present for the entire unfinished task, including pauses. The separate operation lock lasts only for a state mutation. A process crash can leave it behind; refuse further mutations until its owner and the pending operation have been inspected. Do not reclaim it solely from age or PID reuse.
+The helper stores its reservation under the canonical Git common directory at `agent-team-lite/slot`. `mkdir` reserves an operation lock atomically so concurrent starts cannot both succeed. The slot remains present for the entire unfinished run, including pauses, deployment holds, and between-task transitions. The separate operation lock lasts only for a state mutation. A process crash can leave it behind; refuse further mutations until its owner and the pending operation have been inspected. Do not reclaim it solely from age or PID reuse.
 
 The orchestrator owns task/resume notes in the primary checkout. Record the absolute task-file path, primary branch, session identity, helper-owner token, task description, feature branch/path, base commit, teammate identities, reviewed revision, blockers, and next action. The token distinguishes cooperative owners; it is not a security credential or authentication barrier. Teammates never call the helper.
 
@@ -32,3 +32,11 @@ No slot but existing unfinished Lite notes or an owned feature worktree is incon
 There is no cancel, reset, or force-start command. If a task must be abandoned, get explicit instructions, stop all writers, preserve the branch/files/notes, and reconcile the reservation as a separate recovery operation. Do not build an abandonment shortcut into start or resume.
 
 The helper enforces reservation and phase checks for cooperating invocations. Worktree count, agent liveness, source review, permissions, and complete integration evidence also require the orchestrator's checks. Do not claim that shell metadata can enforce these across independent clones or hosts.
+
+## Serial extensions
+
+Read [runs](runs.md) for the admission/deployment checkpoints and canonical run fields. `finish OWNER COMMIT retain` performs the existing cleanup/ancestry checks and enters `between` without moving or deleting the slot. `next OWNER TASK ABSOLUTE_FEATURE_PATH` works only from `between`, updates task/path under the operation lock, and returns to planning. The owner remains unchanged. Finish without retain releases only from cleanup/between after all run gates are satisfied.
+
+`hold OWNER REASON` stores the prior phase and reason, then enters held. It blocks next and finish. `recover OWNER` restores that phase only after the orchestrator has reconciled the blocker; it is not automatic retry authority. Pause supports between/held; resume from a paused hold returns to held. Keep reasons/outcomes and next actions in canonical notes even after recovery. Completed task evidence belongs in the canonical task record before slot fields are reused.
+
+The helper's operation lock serializes mutations, including project settings saves. An interrupted multi-file operation can leave partial state: preserve the lock and reservation and reconcile notes, fields, Git, and processes before explicitly completing it. Do not auto-clear a lock, infer success from one field, or admit work while ownership is uncertain. No helper action proves writer liveness, deployment authority/outcome, review quality, or task readiness.

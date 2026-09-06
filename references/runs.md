@@ -1,0 +1,30 @@
+# Serialized runs and limited deployment
+
+Read this before continuous start, task completion, pause/resume, or auto-deploy. The existing canonical local task record remains the only task ledger. The orchestrator records a small run section in CONTEXT.md: owner token/session, task-file path and authorized queue scope, effective continuous/auto-deploy values and sources, saved deployment choice, current task ID, phase/checkpoints, pause intent, hold reason and next action. Keep per-task review/integration/removal and deployment evidence in the canonical task record. No additional registry, daemon, or full Agent-Team machinery.
+
+Start acquires the repository slot once. Continuous mode processes ready, authorized, unassigned tasks in the existing record's priority/order (stable task ID breaks ties), one at a time. Recheck dependencies, scope, ownership, and authority before every admission. Never invent tasks, treat backlog presence as authorization, or expand the queue scope. No ready task before claim means report exhaustion/blocker without reserving a slot. A single explicit task never expands into queue work.
+
+## Task boundary under the same reservation
+
+1. Complete source review and repairs, mandatory gates, and authorized integration of the exact reviewed revision. Record evidence; review does not authorize merge/push/deploy.
+2. Stop developer/reviewer activity and all owned writers. Preserve all files and notes. Safely remove the current feature worktree and confirm it is unregistered. Keep its branch unless deletion is separately authorized.
+3. Record completion and the integrated commit. Use `finish OWNER COMMIT retain` to enter `between` without releasing the slot. Use this checkpoint for continuous runs and for any run with auto-deploy pending. The helper checks worktree absence and commit ancestry; human/host evidence supplies the remaining gates.
+4. Handle the task's deployment if enabled, as below. Recheck pause intent before any submission and before next admission. A hold or uncertain outcome prevents advancement.
+5. Only after all checkpoints succeed, select the next ready authorized task. Record its identity and next path as pending admission, then call `next OWNER TASK ABSOLUTE_FEATURE_PATH`; retain the same owner and slot. Record the admitted task before creating its one worktree/dispatching. Never call finish-with-release followed by claim between tasks. If interrupted during this boundary, reconcile pending admission and slot fields before writing anything.
+6. If continuous is off or work is exhausted, record terminal reason/next action and release with `finish OWNER COMMIT`. If a blocker, missing authority, or uncertain ownership prevents continuation, call `hold OWNER REASON` when safely possible, retain the reservation, and report the next action. Do not busy-poll or promise work after the host ends.
+
+## Deployment, only when enabled
+
+After each completed, integrated, cleaned-up task, use only the project's existing deployment mechanism and established destination authority. Record task ID, exact integrated/deployment revision, target, authority pointer, command/mechanism, and pending outcome before submission. Verify the mechanism will deploy that revision; unrelated dirty files or revision drift are blockers. Observe the existing command/provider receipt, record success/failure and actual deployed revision. This is deployment outcome evidence, not production testing or feature validation.
+
+No deployment with auto-deploy off. No batching, provisioning, plugin installation, rollback automation, production testing, or production cleanup. Enabling deployment never authorizes an unknown destination, bypasses mandatory gates, or grants destructive permissions. If target/mechanism/authority is missing, hold and request only the missing decision.
+
+On failure or uncertain/in-flight outcome, record recovery identifiers/output, revision, reason, and next action; `hold OWNER deployment-failure` prevents both automatic deployment and next-task admission. Do not automatically retry, skip the task, or release ownership. Resume inspects existing receipt/provider evidence before any retry, avoiding duplicate submission. A confirmed success is recorded without redeploying. Retry only after the concrete cause is resolved and retry authority exists; otherwise remain held. A deliberate disable can leave the task integrated but undeployed, with that result recorded, after resolving any in-flight ambiguity. Never claim deployment success without evidence.
+
+## Pause and recovery
+
+Record pause intent immediately, before waiting for writers or an in-flight integration/deployment to reach a safe outcome. Intent blocks admission and submission even before phase becomes paused. Observe already submitted operations safely; do not pretend to cancel them. Set `phase OWNER paused` only once affected activity stops; otherwise report pause pending. Pause keeps the slot even in `between` or `held` with no worktree.
+
+Resume checks ownership, actual Git/worktree state, surviving agents, pending admission, and all recorded steps. Transfer ownership only after the old orchestrator and writers demonstrably stopped. `resume OWNER` restores the saved phase; a paused hold restores `held`, not running. `recover OWNER` is an internal action used only after evidence resolves the blocker, restoring its prior phase. Never clear a deployment hold merely because the user said resume. Reconcile a crash after integration, removal, or deployment without repeating completed actions. Missing worktree is expected in `between` and after evidenced cleanup; missing development work remains a blocker. The host session owns execution; no background scheduler is created.
+
+After a successfully reconciled explicit resume, clear the recorded pause intent before continuing eligible work. Restore any independent hold unchanged; clearing pause intent never clears deployment failure, missing authority, or uncertain ownership. If reconciliation fails, retain pause intent and report the blocker.
