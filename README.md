@@ -1,6 +1,6 @@
 # Agent Team Lite
 
-Up to two independent teams. One feature worktree per team. Each orchestrator also integrates its result.
+One project orchestrator coordinates up to two independent teams. Each team has one feature worktree, and the project orchestrator integrates their results.
 
 Agent Team Lite is a standalone development skill for Codex and Claude Code. It provides a small development and source-review workflow without external skill or plugin dependencies.
 
@@ -102,7 +102,7 @@ Maintainers build releases from the exact integrated revision; checkout dirtines
 sh scripts/build-release.sh <integrated-commit> dist
 ```
 
-The builder reads the version from that revision and creates `agent-team-lite-<version>.zip` with a stable `agent-team-lite/` archive root. It also writes `SHA256SUMS` and `RELEASE_REVISION` evidence, refuses to overwrite output, and excludes `checks/`, `.github/`, and the release builder itself. Run `sh checks/package.sh` on the source checkout before publishing; the extracted package intentionally omits repository maintenance checks. Verify the ZIP from its output directory with `sha256sum -c SHA256SUMS`. The package has no runtime, plugin, or paid-service dependency; the GitHub Actions check uses only Git and the standard shell.
+The builder reads the version from that revision and creates `agent-team-lite-<version>.zip` with a stable `agent-team-lite/` archive root. It also writes `SHA256SUMS` and `RELEASE_REVISION` evidence, refuses to overwrite output, and excludes `checks/`, `.github/`, and the release builder itself. Run `sh checks/package.sh` on the source checkout before publishing; the extracted package intentionally omits repository maintenance checks. Verify the ZIP from its output directory with `sha256sum -c SHA256SUMS`. The package has no runtime, plugin, or paid-service dependency; the GitHub Actions check uses Git plus standard command-line tools such as `sha256sum` and `unzip`.
 
 The authorized distribution repository is [thebpandey/agent-team-lite](https://github.com/thebpandey/agent-team-lite). A manual user-wide installation on a Unix-like system can use these locations:
 

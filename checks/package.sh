@@ -19,7 +19,7 @@ fi
 for path in SKILL.md LICENSE README.md 'Installation Instructions.md' CHANGELOG.md \
     agents/openai.yaml assets/icon.svg references/commands.md references/hosts.md \
     references/integration.md references/output.md references/runs.md \
-    references/state.md scripts/team-slot.sh; do
+    references/state.md scripts/team-slot.sh scripts/readiness.sh; do
     [ -f "$check_root/$path" ] || { echo "missing package file: $path" >&2; exit 1; }
 done
 
