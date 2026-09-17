@@ -12,7 +12,7 @@ Message content.
 ==========================================================================
 ```
 
-Use `Agent-Team Lite / Developer` or `Agent-Team Lite / Reviewer` for teammate messages. No named teams, IDs, or multi-team namespace. Use one frame for a report/table; never nest frames. A relay may have separate frames for separate messages, or role-labeled text within one report frame. Native tool/widget payloads remain unchanged; frame accompanying prose. Do not fence the whole response in Markdown; only the wordmark uses a text fence.
+Use `Agent-Team Lite / Developer` or `Agent-Team Lite / Reviewer` for teammate messages. When two teams are active, include the recorded team identifier in the body only when needed to distinguish a status, blocker, pause, or completion; it is a selection token, not a user-created namespace. Use one frame for a report/table; never nest frames. A relay may have separate frames for separate messages, or role-labeled text within one report frame. Native tool/widget payloads remain unchanged; frame accompanying prose. Do not fence the whole response in Markdown; only the wordmark uses a text fence.
 
 For each user-invoked supported help, start, resume, settings, or status action, put this wordmark inside the first frame, before the role and body. Combined commands show it once total. Never repeat for progress, teammate replies, quoted commands, or internal continuous iterations. Resolve actions, not substrings in task descriptions.
 
