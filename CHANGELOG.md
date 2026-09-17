@@ -4,9 +4,11 @@ Semantic versioning uses MAJOR.MINOR.PATCH. `metadata.version` in SKILL.md is au
 
 ## 6.2.0 — 2026-09-16
 
-- Add dependency-free package integrity checks and CI coverage for the installable folder.
-- Add an exact-revision GitHub Release ZIP builder that excludes repository-only maintenance files.
-- Clarify the free Lite offering, serialized continuity limits, and release/install evidence.
+- Support up to two disjoint teams with serial integration for each team.
+- Preserve same-project session continuity without an owner gate, while retaining live-writer safety.
+- Add read-only readiness and durable observed host, model, revision, and gate evidence.
+- Require exact-revision closeout and deployment evidence for authorized runs.
+- Add dependency-free package integrity checks, exact-revision ZIPs, and CI coverage.
 
 ## 6.1.0 — 2026-09-06
 
