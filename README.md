@@ -1,12 +1,12 @@
 # Agent Team Lite
 
-One team. One feature worktree. One orchestrator who also integrates the result.
+Up to two independent teams. One feature worktree per team. Each orchestrator also integrates its result.
 
 Agent Team Lite is a standalone development skill for Codex and Claude Code. It provides a small development and source-review workflow without external skill or plugin dependencies.
 
 ## Version
 
-Current version: **6.1.0**. `metadata.version` in `SKILL.md` is authoritative; see [CHANGELOG.md](CHANGELOG.md). This is Lite's first recorded semantic version, set to 6.1.0 at the maintainer's explicit request; earlier commits were unversioned. It does not imply feature parity with the full edition. Update metadata, README, and changelog together: PATCH for fixes, MINOR for compatible additions, MAJOR for incompatible changes. Displaying the installed version is local and performs no remote freshness check.
+Current version: **6.2.0**. `metadata.version` in `SKILL.md` is authoritative; see [CHANGELOG.md](CHANGELOG.md). Lite remains a free, standalone offering and does not imply feature parity with the full edition. Update metadata, README, and changelog together: PATCH for fixes, MINOR for compatible additions, MAJOR for incompatible changes. Displaying the installed version is local and performs no remote freshness check.
 
 ## Architecture
 
@@ -18,7 +18,7 @@ Current version: **6.1.0**. `metadata.version` in `SKILL.md` is authoritative; s
 | Main checkout | Planning, shared task/resume records, and the integrated result. |
 | One feature worktree | All feature changes, source review, and conflict repairs. |
 
-A worktree is a separate working folder managed by Git. Lite creates only one additional worktree per unfinished task. There are no child worktrees, dedicated integration worktrees, or additional team leads.
+A worktree is a separate working folder managed by Git. Lite creates one additional worktree per unfinished task, with at most two independent team reservations in the repository. There are no child worktrees, dedicated integration worktrees, or additional team leads.
 
 Only the orchestrator starts teammates. The developer and reviewer never spawn agents. Review and repair reuse the same team; developer writes stop while the reviewer inspects the source.
 
@@ -30,7 +30,7 @@ These are requests to the skill, not shell commands.
 | --- | --- | --- |
 | `$agent-team-lite start [task]` | `/agent-team-lite start [task]` | Start one scoped task. Without a task description, select one ready unassigned task from an existing local task record. |
 | `$agent-team-lite status` | `/agent-team-lite status` | Read the current team's saved progress and blockers without interrupting work. |
-| `$agent-team-lite pause` | `/agent-team-lite pause` | Safely pause the only team, preserving its slot and worktree. |
+| `$agent-team-lite pause` | `/agent-team-lite pause` | Safely pause the addressed team, preserving its slot and worktree. |
 | `$agent-team-lite resume` | `/agent-team-lite resume` | Continue the same unfinished team, task, and worktree. |
 
 Help and settings are also supported:
@@ -40,8 +40,8 @@ Help and settings are also supported:
 | `help` | Read-only guide to every command, defaults, examples, and edition limits. |
 | `settings` | Read project defaults without writing files. |
 | `settings continuous=on auto-deploy=off` | Save either or both defaults for future runs only. |
-| `start continuous` | Process ready authorized tasks from the existing local task record serially. |
-| `start continuous auto-deploy` | Same serial run, deploying each completed integrated task through the existing authorized mechanism. |
+| `start continuous` | Process ready authorized tasks for this team serially. |
+| `start continuous auto-deploy` | Same per-team serial run, deploying each completed integrated task through the existing authorized mechanism. |
 | `start no-continuous no-auto-deploy` | Override saved defaults for one run. |
 
 Both settings default to off, in the primary checkout's `.agent-team-lite/settings.json`. Explicit run override > saved project default > built-in default. Saved auto-deploy on requires a keep/disable choice before starting; explicit run-only `auto-deploy` supplies that choice. Saving settings does not start or deploy. Resume restores recorded run choices. No unknown destination or mandatory gate is authorized by enabling deployment.
@@ -71,7 +71,7 @@ There is no team picker, named-team targeting, `all`, `with-preview`, `approve`,
 - A local task record, short resume notes, and final requirement reconciliation.
 - A focused source-review and repair loop.
 - Basic UI guidance using the project's existing components and conventions.
-- A persistent single-team reservation shared across the repository's linked worktrees.
+- A persistent per-team reservation shared across the repository's linked worktrees, with capacity for two independent teams.
 - Integration by the orchestrator and safe removal of the one completed feature worktree.
 - Optional serialized continuous scheduling and limited per-task auto-deploy, both off by default.
 - Deployment failure holds both further admission and deployment until recovery is resolved.
@@ -80,7 +80,7 @@ By default, the orchestrator keeps `.agent-team-lite/TASKS.md` and `.agent-team-
 
 ## Excluded
 
-- Multiple teams, nested delegation, specialist agents, or a separate integrator.
+- More than two teams, nested delegation, specialist agents, or a separate integrator.
 - Agents or workflow stages for writing feature-code documentation.
 - Feature, unit, integration, end-to-end, or automated browser testing.
 - Visual browser review, preview servers, and preview-approval gates.
@@ -92,7 +92,17 @@ Task and resume notes are part of coordination, not feature-code documentation. 
 
 ## Installation
 
-Download the installable `agent-team-lite-6.1.0.zip` from [GitHub Releases](https://github.com/thebpandey/agent-team-lite/releases/tag/v6.1.0), then follow [Installation Instructions](Installation%20Instructions.md). Install the complete folder, including `scripts/` and `references/`, using your host's supported skill installation process. Do not install only `SKILL.md`. The installation ZIP omits repository-only maintenance checks.
+Download the installable `agent-team-lite-6.2.0.zip` from [GitHub Releases](https://github.com/thebpandey/agent-team-lite/releases/tag/v6.2.0), then follow [Installation Instructions](Installation%20Instructions.md). Install the complete folder, including `scripts/` and `references/`, using your host's supported skill installation process. Do not install only `SKILL.md`. The installation ZIP omits repository-only maintenance checks and CI configuration.
+
+### Release package integrity
+
+Maintainers build releases from the exact integrated revision; checkout dirtiness does not affect the archive:
+
+```sh
+sh scripts/build-release.sh <integrated-commit> dist
+```
+
+The builder reads the version from that revision and creates `agent-team-lite-<version>.zip` with a stable `agent-team-lite/` archive root. It also writes `SHA256SUMS` and `RELEASE_REVISION` evidence, refuses to overwrite output, and excludes `checks/`, `.github/`, and the release builder itself. Run `sh checks/package.sh` on the source checkout before publishing; the extracted package intentionally omits repository maintenance checks. Verify the ZIP from its output directory with `sha256sum -c SHA256SUMS`. The package has no runtime, plugin, or paid-service dependency; the GitHub Actions check uses only Git and the standard shell.
 
 The authorized distribution repository is [thebpandey/agent-team-lite](https://github.com/thebpandey/agent-team-lite). A manual user-wide installation on a Unix-like system can use these locations:
 
@@ -114,9 +124,9 @@ If the destination already exists, inspect it and update the existing installati
 
 The workflow needs Git, a standard shell, ordinary system utilities, and a host that can dispatch the developer and reviewer in the specified worktree. It adds no package or plugin dependencies. Model selection follows the user's existing host policy and available coding-capable models; Lite does not buy access or change its parent model. Native dispatch must be verified on the actual host.
 
-## Single-team guarantee and limits
+## Per-team guarantee and repository limits
 
-The bundled shell helper reserves one slot atomically before work starts. Pausing keeps that reservation. A second cooperative Lite start is denied, including from another linked worktree. Interrupted or incomplete metadata is treated as occupied until ownership is reconciled.
+The bundled shell helper reserves team slots atomically before work starts, up to two independent teams. Pausing keeps that team's reservation. A third cooperative Lite start is denied, including from another linked worktree. Interrupted or incomplete metadata is treated as occupied until ownership is reconciled.
 
 The slot is released only after integration is recorded, team activity is stopped, the feature worktree is safely removed, and the run ends safely. Continuous runs retain the same reservation between tasks; enabled per-task deployment completes before the next admission. A reviewed feature waiting for a merge still occupies the slot. Lite never force-removes unfinished files to make room for another task.
 
@@ -130,7 +140,7 @@ A skill cannot guarantee a checkpoint after a crash or keep agents running after
 | --- | --- |
 | `SKILL.md` | Scope, commands, roles, and workflow. |
 | `agents/openai.yaml` | Codex/ChatGPT display metadata. |
-| `scripts/team-slot.sh` | Cooperative single-team reservation and phase checks. |
+| `scripts/team-slot.sh` | Cooperative per-team reservation and phase checks. |
 | `references/state.md` | Ownership, internal helper usage, and recovery rules. |
 | `references/hosts.md` | Native Codex and Claude Code dispatch constraints. |
 | `references/commands.md` | Help, routing, and two project settings. |

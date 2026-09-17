@@ -105,14 +105,14 @@ Paths below are relative to the installed `agent-team-lite` folder:
 | `Installation Instructions.md` | This installation guide. |
 | `agents/openai.yaml` | Display and discovery metadata. |
 | `assets/icon.svg` | Icon referenced by the metadata. |
-| `scripts/team-slot.sh` | Single-team reservation helper. |
+| `scripts/team-slot.sh` | Per-team reservation helper. |
 | `references/hosts.md` | Codex and Claude Code dispatch rules. |
 | `references/state.md` | Ownership, pause, resume, and recovery rules. |
 | `references/integration.md` | Integration by the orchestrator. |
 
 The host invokes the helper through `sh`, so execution does not depend on a ZIP extractor retaining its executable permission. Keep the script's Unix line endings; do not convert it to Windows CRLF.
 
-Install all reference files, including `commands.md`, `output.md`, and `runs.md`, and keep `CHANGELOG.md`. No full agent-team package or additional runtime dependency is needed. The package version is **6.1.0**, authoritative in SKILL.md metadata. Refresh the host after replacing a complete installation. `help` displays the installed version without checking for remote updates; it works without reserving a slot or starting work.
+Install all reference files, including `commands.md`, `output.md`, and `runs.md`, and keep `CHANGELOG.md`. No full agent-team package, plugin, paid service, or additional runtime dependency is needed. The package version is **6.2.0**, authoritative in SKILL.md metadata. Refresh the host after replacing a complete installation. `help` displays the installed version without checking for remote updates; it works without reserving a slot or starting work.
 
 ## 6. Use the limited command set
 
@@ -121,13 +121,13 @@ Install all reference files, including `commands.md`, `output.md`, and `runs.md`
 | Read help/version | `$agent-team-lite help` | `/agent-team-lite help` |
 | Read defaults | `$agent-team-lite settings` | `/agent-team-lite settings` |
 | Save defaults | `$agent-team-lite settings continuous=on auto-deploy=off` | `/agent-team-lite settings continuous=on auto-deploy=off` |
-| Serial queue | `$agent-team-lite start continuous` | `/agent-team-lite start continuous` |
+| Per-team serial queue | `$agent-team-lite start continuous` | `/agent-team-lite start continuous` |
 | Start one task | `$agent-team-lite start [task]` | `/agent-team-lite start [task]` |
 | Read progress | `$agent-team-lite status` | `/agent-team-lite status` |
-| Pause the only team | `$agent-team-lite pause` | `/agent-team-lite pause` |
+| Pause a team | `$agent-team-lite pause` | `/agent-team-lite pause` |
 | Continue that team | `$agent-team-lite resume` | `/agent-team-lite resume` |
 
-An active, paused, or interrupted team blocks another start in the same repository. A pause preserves its worktree. Resume continues that team. Do not delete reservation files to force a new task.
+An active, paused, or interrupted team consumes one of the repository's two team reservations. A pause preserves its worktree. Resume continues that team. Do not delete reservation files to force a new task.
 
 Lite does not provide `with-preview`, `approve`, named-team targeting, or `all` actions. It does not add feature testing or documentation agents. Limited per-task auto-deploy and serial continuous mode are optional and default to off. The README explains the full scope.
 
@@ -137,8 +137,8 @@ Plain language `agent-team-lite start continuous` works too. Use `start continuo
 
 - **Skill is missing:** Check the exact installation path and look for an accidental double-nested folder. Refresh the host's skill selector. Confirm the host reads the same machine or WSL environment where you copied the files.
 - **Helper cannot run:** Confirm `sh` and Git are available in the host's environment, the script is present, and the working directory is the target Git repository.
-- **Another team is reported:** Read `status`, then resume the existing task. A paused team intentionally retains the only slot.
+- **Another team is reported:** Read `status`, then resume the existing task or use the remaining reservation for an independent team. A paused team intentionally retains its reservation.
 - **Agent dispatch is unavailable:** Installation alone does not create host capabilities. Lite must report that blocker instead of pretending it started a team.
 - **Managed ChatGPT installation:** The filesystem instructions above target your own local CLI/IDE environment. They do not install the skill into a separate ChatGPT-managed environment.
 
-Installation paths checked against official documentation on 2026-09-05. The archive's contents and directory structure have been checked; a complete development run on every host and operating system has not been performed.
+The 6.2.0 release ZIP is built from an exact integrated commit. Before publishing, maintainers run `sh checks/package.sh` on the source checkout and `sh scripts/build-release.sh <integrated-commit> <output-directory>`; the resulting archive contains the installable `agent-team-lite/` folder but not repository-only checks or CI files. Verify the published ZIP with `sha256sum -c SHA256SUMS` and compare `RELEASE_REVISION` with the intended integrated commit. A complete development run on every host and operating system has not been performed.

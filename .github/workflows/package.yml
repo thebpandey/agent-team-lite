@@ -1,0 +1,35 @@
+name: Package integrity
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check package integrity
+        run: sh checks/package.sh
+      - name: Build exact-revision release ZIP
+        run: |
+          sh scripts/build-release.sh "$GITHUB_SHA" "$RUNNER_TEMP/release"
+          archive="$RUNNER_TEMP/release/agent-team-lite-$(sed -n 's/^  version: "\(.*\)"$/\1/p' SKILL.md).zip"
+          test -s "$archive"
+          test "$(cat "$RUNNER_TEMP/release/RELEASE_REVISION")" = "$GITHUB_SHA"
+          (cd "$RUNNER_TEMP/release" && sha256sum -c SHA256SUMS)
+          extract="$RUNNER_TEMP/extracted"
+          mkdir "$extract"
+          unzip -q "$archive" -d "$extract"
+          test -f "$extract/agent-team-lite/SKILL.md"
+          test -f "$extract/agent-team-lite/README.md"
+          test "$(sed -n 's/^  version: "\(.*\)"$/\1/p' "$extract/agent-team-lite/SKILL.md")" = "$(sed -n 's/^  version: "\(.*\)"$/\1/p' SKILL.md)"
+          test ! -e "$extract/agent-team-lite/checks"
+          test ! -e "$extract/agent-team-lite/.github"
+          test ! -e "$extract/agent-team-lite/scripts/build-release.sh"
+          sh checks/package.sh "$extract/agent-team-lite"
