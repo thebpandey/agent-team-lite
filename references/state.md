@@ -1,42 +1,61 @@
-# Single-team state and ownership
+# Lite state, continuity, and readiness
 
-The slot helper requires only a standard shell, Git, and ordinary system utilities. Run it from the project or any linked worktree with `sh /absolute/installed/skill/scripts/team-slot.sh ...`. These are internal helpers, not extra user-facing skill commands.
+The bundled helpers use only POSIX shell, Git, and ordinary system utilities. They are internal helpers, not user-facing skill commands. Run them from the target repository or any linked worktree, using the absolute installed-skill path.
 
-The helper stores its reservation under the canonical Git common directory at `agent-team-lite/slot`. `mkdir` reserves an operation lock atomically so concurrent starts cannot both succeed. The slot remains present for the entire unfinished run, including pauses, deployment holds, and between-task transitions. The separate operation lock lasts only for a state mutation. A process crash can leave it behind; refuse further mutations until its owner and the pending operation have been inspected. Do not reclaim it solely from age or PID reuse.
+`team-slot.sh` stores cooperative state in the canonical Git common directory at `agent-team-lite/`. A short-lived `operation.lock` directory atomically serializes each state mutation across linked worktrees. If it remains after a failed/interrupted mutation, preserve it and inspect the records, Git state, and writers; never clear it from age or PID reuse.
 
-The orchestrator owns task/resume notes in the primary checkout. Record the absolute task-file path, primary branch, session identity, helper-owner token, task description, feature branch/path, base commit, teammate identities, reviewed revision, blockers, and next action. The token distinguishes cooperative owners; it is not a security credential or authentication barrier. Teammates never call the helper.
+## Compatibility and two-team records
 
-| Internal operation | When to use |
+The legacy 6.1 record remains at `agent-team-lite/slot/` and its commands remain available:
+
+| Internal operation | Purpose |
 | --- | --- |
-| `show` | Read the slot without creating files. Partial state is unfinished, not empty. |
-| `claim OWNER TASK ABSOLUTE_FEATURE_PATH` | Reserve once before project mutations, worktree creation, or agent dispatch. OWNER is the current host/session identity or a uniquely recorded opaque identifier. The path must be unused. |
-| `phase OWNER developing` | Begin implementation after planning and creation of the one worktree. |
-| `phase OWNER reviewing` | Freeze writes for source review. |
-| `phase OWNER integrating` | Begin integration of the reviewed revision. |
-| `phase OWNER cleanup` | Integration is confirmed; finish records and safe worktree removal. |
-| `phase OWNER paused` | Only after affected writers and integration have stopped safely. Previous phase is saved. |
-| `resume OWNER` | Restore the saved phase of the same paused team. Check files and processes first. |
-| `adopt OLD_OWNER NEW_OWNER` | Transfer the existing slot only after confirming the old orchestrator and teammate writers stopped, or a coordinated handoff completed. |
-| `finish OWNER FULL_INTEGRATED_COMMIT` | Release after integration evidence is recorded, writers stopped, and the feature worktree is removed. The helper checks cleanup phase, worktree absence, and ancestry of the recorded integration revision. |
+| `show` | Read the legacy record without writes. |
+| `claim OWNER TASK ABSOLUTE_FEATURE_PATH` | Create the legacy reservation. |
+| `phase OWNER NEXT_PHASE`, `resume OWNER`, `hold OWNER REASON`, `recover OWNER` | Advance, pause/resume, or hold/recover its lifecycle. |
+| `next OWNER TASK ABSOLUTE_FEATURE_PATH` | Reuse a retained legacy reservation from `between`. |
+| `finish OWNER FULL_INTEGRATED_COMMIT [retain]` | Record integration; `retain` moves it to `between`, otherwise releases it after the usual cleanup checks. |
+| `adopt OLD_OWNER NEW_OWNER` | Optional audit-provenance update only. |
 
-Always quote arguments and use tool-supported structured arguments or proper shell quoting for user task text. Never use `eval`, execute task text, or source slot files as shell code. Feature paths must be absolute, newline-free paths supplied as data.
+`OWNER` is audit provenance, never an authentication or historic-session lock. A fresh native session may use the normal legacy operations with its own recorded token after the host has reconciled actual writer liveness. Do not require `adopt` for ordinary continuation.
 
-## Resume without a second team
+The explicit team-aware records live at `agent-team-lite/teams/TEAM/`, with `owner`, `task`, `main`, `worktree`, `phase`, and `owned` fields. Use these operations for up to two independent teams:
 
-Read slot state, canonical task/resume notes, `git worktree list --porcelain`, branch revisions, dirty files, and host agent/process state. Treat the actual source as authoritative. Active known writers prevent replacement; attach to them where supported. A missing session is not proof that its processes ended. If the old owner has demonstrably stopped, adopt the same reservation and replace only stopped teammate roles. Never create a second orchestrator as an integration worker.
+| Internal operation | Purpose |
+| --- | --- |
+| `team-admit TEAM OWNER TASK ABSOLUTE_WORKTREE_PATH OWNED...` | Atomically reserve a named team. Every `OWNED` entry is `path:ABSOLUTE_PATH` or `resource:ONE_LINE_ID`; the worktree location is implicitly owned. Paths are normalized first against proposed named worktree roots (even before Git creates them), then registered linked worktrees, so the same source through different future or existing worktree paths conflicts. |
+| `team-show [TEAM]` | Read one/all named records without writes. |
+| `team-phase TEAM NEXT_PHASE`, `team-hold TEAM REASON`, `team-recover TEAM` | Lifecycle operations with the same valid phases as the legacy record. `paused` preserves `previous`; a paused hold resumes to `held`. |
+| `team-finish TEAM FULL_INTEGRATED_COMMIT [retain]` | Requires cleanup/between, no remaining/registered feature worktree, and main ancestry. `retain` records the commit and enters `between`; finish without it releases capacity. |
+| `team-closeout TEAM FULL_INTEGRATED_COMMIT TARGET AUTHORITY RECEIPT OUTCOME` | Records the narrow closeout receipt required before release from `between`. `OUTCOME` is `disabled` or `succeeded`; `disabled` requires literal `disabled` placeholders for target, authority, and receipt, while `succeeded` requires exact non-`disabled` values for all three. |
+| `team-adopt TEAM NEW_OWNER` | Optional audit-provenance update only, never a session-switch requirement. |
 
-Planning may have reserved a path before creating the worktree. Resume may create that one recorded path only when evidence confirms no feature worktree was ever created. If development had begun and its worktree disappeared, report lost/missing work; do not silently replace it. If phase is cleanup and notes plus current Git state confirm removal already succeeded, finish the same slot. If phase says integration but evidence proves the merge completed, record that evidence and continue cleanup without merging again.
+Named records share a limit of two active reservations. Admission is atomic under `operation.lock`: it rejects a third named claim, an existing team name, an incomplete record, duplicate resource ID, and equal/ancestor/descendant repository-relative or external path keys. A legacy 6.1 slot has no owned-source/resource fields, so mixed legacy/named admission fails closed in both directions; complete the legacy reservation or perform an evidence-backed migration before named admission. An incomplete legacy or named record is uncertain and blocks admission; preserve it for reconciliation.
 
-No slot but existing unfinished Lite notes or an owned feature worktree is inconsistent state. Block new start, investigate, and restore ownership only from evidence. Do not interpret a lost guard as permission for another team. Partial claim or interrupted operation likewise requires reconciliation; never delete it merely to make start work.
+The helper records cooperation safely but cannot inspect host agent/process liveness or writers outside its own invocation. A known-live or unknown writer remains occupied at the host level: do not replace it or reuse conflicting paths/resources. A missing session is not proof that it stopped. After actual host reconciliation, normal operations continue without the historical owner token.
 
-There is no cancel, reset, or force-start command. If a task must be abandoned, get explicit instructions, stop all writers, preserve the branch/files/notes, and reconcile the reservation as a separate recovery operation. Do not build an abandonment shortcut into start or resume.
+## Shared integration
 
-The helper enforces reservation and phase checks for cooperating invocations. Worktree count, agent liveness, source review, permissions, and complete integration evidence also require the orchestrator's checks. Do not claim that shell metadata can enforce these across independent clones or hosts.
+`integration acquire TEAM`, `integration release TEAM`, and `integration show` use `agent-team-lite/integration.lock/`. Only one named team can reserve main integration at once. Acquire requires `integrating`; release requires the same named reservation and `cleanup`, `between`, or `held`—a recorded safe endpoint phase. The helper does not prove that endpoint, gate results, or provider outcome. The orchestrator releases only after the shared-main writer stopped and its evidence is recorded.
 
-## Serial extensions
+`team-finish ... retain` enters `between` and cannot run while an integration lock exists. A later release requires a matching `team-closeout` receipt. Use `disabled disabled disabled disabled` only when auto-deploy is off. For an enabled successful deployment, use `succeeded` with exact target, authority, and receipt pointer. Unknown or failed deployment must remain held with evidence; it cannot release capacity.
 
-Read [runs](runs.md) for the admission/deployment checkpoints and canonical run fields. `finish OWNER COMMIT retain` performs the existing cleanup/ancestry checks and enters `between` without moving or deleting the slot. `next OWNER TASK ABSOLUTE_FEATURE_PATH` works only from `between`, updates task/path under the operation lock, and returns to planning. The owner remains unchanged. Finish without retain releases only from cleanup/between after all run gates are satisfied.
+## Read-only readiness
 
-`hold OWNER REASON` stores the prior phase and reason, then enters held. It blocks next and finish. `recover OWNER` restores that phase only after the orchestrator has reconciled the blocker; it is not automatic retry authority. Pause supports between/held; resume from a paused hold returns to held. Keep reasons/outcomes and next actions in canonical notes even after recovery. Completed task evidence belongs in the canonical task record before slot fields are reused.
+Run `sh /absolute/installed/skill/scripts/readiness.sh` before dispatch or when switching sessions. It never creates, repairs, locks, adopts, or removes files. It reports Git root, primary checkout, common directory, and committed base; the primary checkout's canonical task-ledger path and presence; active claim capacity (`0`–`2`), incomplete-state blocking, and any `operation.lock`; integration lock; and dispatch/gate/deployment facts.
 
-The helper's operation lock serializes mutations, including project settings saves. An interrupted multi-file operation can leave partial state: preserve the lock and reservation and reconcile notes, fields, Git, and processes before explicitly completing it. Do not auto-clear a lock, infer success from one field, or admit work while ownership is uncertain. No helper action proves writer liveness, deployment authority/outcome, review quality, or task readiness.
+Optional inputs are explicit, so missing facts stay visible rather than invented:
+
+```sh
+sh /absolute/installed/skill/scripts/readiness.sh \
+  --ledger /absolute/project/.agent-team-lite/TASKS.md \
+  --developer known --reviewer unknown --gates known \
+  --gate-identities 'CI, source review' --gate-availability available \
+  --auto-deploy-target unknown \
+  --auto-deploy-mechanism unknown \
+  --auto-deploy-authority unknown
+```
+
+`--developer`, `--reviewer`, and `--gates` accept only `known` or `unknown`; omitted values report `unknown`. `--gate-identities` and `--gate-availability` carry one-line observed facts and otherwise report `unknown`, so readiness never invents a gate or its availability. The three auto-deploy flags accept one-line recorded facts and likewise default to `unknown`. Readiness is evidence gathering, not readiness approval and not liveness proof.
+
+There is no cancel, reset, force-start, lock reclamation, or arbitrary active-claim release command. If work must be abandoned, stop writers, preserve branches/files/notes, obtain explicit direction, and reconcile the record from evidence.
