@@ -2,6 +2,11 @@
 
 Semantic versioning uses MAJOR.MINOR.PATCH. `metadata.version` in SKILL.md is authoritative.
 
+## Unreleased
+
+- Add a per-team progress checklist with loop-backs for review findings and integration conflicts.
+- Add informational `metadata.intended_model`.
+
 ## 6.2.0 — 2026-09-16
 
 - Support up to two disjoint teams with serial integration for each team.

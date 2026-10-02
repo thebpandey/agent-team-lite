@@ -2,6 +2,7 @@
 name: agent-team-lite
 metadata:
   version: "6.2.0"
+  intended_model: opus
 description: Develop up to two independent scoped tasks on Codex or Claude Code with one project orchestrator, at most one developer and one independent reviewer per active team, local task notes, and at most two feature worktrees. Use for agent-team-lite help, settings, start, start continuous, status, pause, resume, or implementation explicitly assigned to Lite. Excludes Pro-only coordination, preview approval, feature testing, documentation agents, and external skill dependencies.
 ---
 
@@ -53,6 +54,24 @@ The cooperative reservation records prevent more than two Lite teams within the 
 7. Have the developer address concrete findings and the same reviewer re-read the affected diff. After two failed attempts without useful progress, change the approach within the same team. If still blocked, record the blocker and ask one focused question. Do not grow the team or add repeated review panels.
 8. The orchestrator integrates the reviewed feature revision into main through the project's authorized Git process. There is no dedicated integration worktree or integrator agent. Follow [integration](references/integration.md): acquire the shared integration gate, resolve conflicts in the existing feature worktree, re-review changed portions, and serialize changes to main. Preserve commit permissions and branch protection. Review success does not grant push, merge, or deployment permission.
 9. Reconcile every requirement with source-review evidence and state the untested behavior clearly. Stop this team's writers/processes, preserve needed notes, and safely remove its feature worktree only after integration is confirmed and no unpreserved edits remain. Record the exact integrated revision and retained branch. Do not force-remove worktrees or delete user data. After removal and recorded integration, follow the run reference: finish that team only after any enabled deployment reaches an evidenced safe outcome. If integration, deployment, or removal remains blocked, retain that team’s record in its unfinished phase. Only explicitly enabled per-task auto-deploy through the existing authorized mechanism is included; no rollback or production cleanup.
+
+Keep this per-team checklist in `.agent-team-lite/CONTEXT.md` and tick an item only on observed evidence:
+
+```text
+TEAM <id>
+- [ ] 0. Team record reserved (scripts/team-slot.sh) after read-only readiness
+- [ ] 1. Project instructions, Git state, committed base, dispatch capacity confirmed
+- [ ] 2. TASKS.md and CONTEXT.md records written
+- [ ] 3. One feature worktree created or resumed
+- [ ] 4. Developer and reviewer dispatched
+- [ ] 5. Simplest change implemented
+- [ ] 6. Source review complete
+- [ ] 7. Findings fixed and re-read by the same reviewer
+- [ ] 8. Integrated through the shared integration gate
+- [ ] 9. Requirements reconciled, worktree removed, revision recorded
+```
+
+Never tick 3 before 0. Step 7 findings return to step 5. A conflict in step 8 returns to step 6 for the changed portions.
 
 ## Preserve scope and recovery
 
