@@ -4,6 +4,8 @@ One project orchestrator coordinates up to two independent teams. Each team has 
 
 Agent Team Lite is a standalone development skill for Codex and Claude Code. It provides a small development and source-review workflow without external skill or plugin dependencies.
 
+Agent Team Lite is the MIT-licensed open-source edition of Agent-Team. Case study of the full edition: [Agent-Team on bhaskarpandey.com](https://www.bhaskarpandey.com/work/agent-team). Built by [Bhaskar Pandey](https://www.bhaskarpandey.com), AI & Automation Solutions Engineer.
+
 ## Version
 
 Current version: **6.2.0**. `metadata.version` in `SKILL.md` is authoritative; see [CHANGELOG.md](CHANGELOG.md). Lite remains a free, standalone offering and does not imply feature parity with the full edition. Update metadata, README, and changelog together: PATCH for fixes, MINOR for compatible additions, MAJOR for incompatible changes. Displaying the installed version is local and performs no remote freshness check.
